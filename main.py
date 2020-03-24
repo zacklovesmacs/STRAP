@@ -15,7 +15,7 @@ import csv
 def create_folder(name, return_path=False):
     """ Creates folder with a given name and optional return of new path. """
     path = os.getcwd()
-    folder = f"{path}\{name}"
+    folder = "{}\{}".format(path, name)
     if not os.path.exists(folder):
         os.mkdir(folder)
     if return_path:
@@ -54,7 +54,7 @@ if __name__ == '__main__':
     try:
         for file_name in os.listdir(path_original_files):
             # open file inside the folder
-            file_path = f"{path_original_files}\{file_name}"
+            file_path = "{}\{}".format(path_original_files,file_name)
 
             with open(file_path, 'r') as f:
                 columns = get_column_titles(f)
@@ -79,8 +79,8 @@ if __name__ == '__main__':
                         data_entries.append([employee, units, stow_rate])
 
             # csv name shoud be date and time at generation
-            generated_file_name = f"{current_time()}_stow rates"
-            edited_file_path = f"{path_formatted_files}\{generated_file_name}"
+            generated_file_name = "{}_stow rates".format(current_time())
+            edited_file_path = "{}\{}".format(path_formatted_files,generated_file_name)
 
             # save new csv inside copy folder
             with open(edited_file_path, 'w', newline='') as edited_csv:
