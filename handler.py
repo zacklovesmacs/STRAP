@@ -1,6 +1,5 @@
 import csv
 
-import openpyxl as excel
 import pandas
 
 
@@ -73,8 +72,6 @@ class Analysis():
         with open(path, 'w', newline='') as edited_csv:
             csv.writer(edited_csv).writerows(
                 Analysis.sorted_by_rate(Analysis.data_entries))
-        # convert csv to excel
-        Excel.csv_to_excel(path)
 
 
 class Excel():
@@ -84,17 +81,4 @@ class Excel():
         if not file:
             raise "No file was given to convert"
         csv_file = pandas.read_csv(file)
-        csv_file.to_excel('output.xlsx', sheet_name='asdf', index=False)
-
-
-"""
-wb = excel.Workbook()
-sh = wb.create_sheet('dkz')
-
-with open('edited-copy.csv', 'r') as f:
-	reader = csv.reader(f)
-	for row in reader:
-		sh.append(row)
-
-wb.save('grokonez.xlsx')
-"""
+        csv_file.to_excel('output.xlsx', sheet_name=file.split('\\')[-1], index=False)
