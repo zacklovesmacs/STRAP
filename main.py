@@ -35,9 +35,9 @@ def current_time():
 
 
 def ask_to_choose_file(path):
-    file_name = None
+    file_n = None
 
-    while file_name is None:
+    while file_n is None:
         clear_console()
         print("There are more than 1 file inside the folder!")
         print("\nPlease choose one of the following:")
@@ -52,9 +52,9 @@ def ask_to_choose_file(path):
             time.sleep(1)
             continue
 
-        file_name = original_files[x]
+        file_n = original_files[x]
     clear_console()
-    return file_name
+    return file_n
 
 
 if __name__ == '__main__':
