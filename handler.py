@@ -1,6 +1,7 @@
 import csv
+import os
 
-import pandas
+import openpyxl
 
 
 class Analysis():
@@ -17,7 +18,7 @@ class Analysis():
         self.csv_file = csv.reader(file)
         self.columns = self.get_headers(file) if has_headers else None
 
-    def analyze(self):
+    def analyze(self, sort=True):
         ''' Performs analysis for each row and saves the output to a csv. '''
         for row in self.csv_file:
             self.update_row_data(row)
@@ -25,6 +26,9 @@ class Analysis():
             if self.employee_id not in Analysis.employees_completed:
                 Analysis.employees_completed.append(self.employee_id)
                 self.append_data_entry()
+
+            if sort:
+                Analysis.sorted_by_rate(Analysis.data_entries)
 
     def append_data_entry(self):
         Analysis.data_entries.append(
@@ -57,13 +61,16 @@ class Analysis():
         return columns
 
     @staticmethod
-    def calculate_rate(units_per_hour): return float(
-        '{:.1f}'.format(units_per_hour / 60))
+    def calculate_rate(units_per_hour):
+        return float('{:.1f}'.format(units_per_hour / 60))
 
     @staticmethod
     def sorted_by_rate(entries, increasing_order=False):
-        entries.sort(key=lambda x: x[len(x)-1],
-                     reverse=(increasing_order == False))
+        if not increasing_order:
+            entries.sort(key=lambda x: x[len(x)-1],
+                         reverse=(increasing_order == False))
+        else:
+            entries.sort(key=lambda x: x[len(x)-1])
         return entries
 
     @staticmethod
@@ -75,10 +82,20 @@ class Analysis():
 
 
 class Excel():
-    ''' Uses pandas and openpyxl to handle excel doc customizations '''
+    ''' Uses openpyxl to handle excel doc customizations '''
+
     @staticmethod
-    def csv_to_excel(file: str):
-        if not file:
-            raise "No file was given to convert"
-        csv_file = pandas.read_csv(file)
-        csv_file.to_excel('output.xlsx', sheet_name=file.split('\\')[-1], index=False)
+    def append_data_to_template(data, save_as=None):
+        template_file = os.getcwd() + "\\Excel Template\\stow rate template.xlsx"
+        wb = openpyxl.load_workbook(template_file)
+        ws = wb.active
+
+        file_name = 'sample' if save_as is None else save_as
+
+        for row, info in enumerate(data, start=1):
+            print(row, info)
+            ws['A{}'.format(row)] = info[0]
+            ws['B{}'.format(row)] = info[1]
+            ws['C{}'.format(row)] = info[2]
+
+        wb.save(file_name + '.xlsx')
