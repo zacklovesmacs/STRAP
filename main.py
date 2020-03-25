@@ -8,6 +8,7 @@ Purpose:
 
 
 import os
+import sys
 import time
 import datetime
 
@@ -21,6 +22,10 @@ def create_folder(name):
         os.mkdir(name)
 
 
+def clear_console():
+    return os.system('cls')
+
+
 def create_path(path, file):
     return "{}\{}".format(path, file)
 
@@ -28,6 +33,29 @@ def create_path(path, file):
 def current_time():
     """ Returns the local time in ISO format. Without microseconds. """
     return datetime.datetime.now().replace(microsecond=0).isoformat().replace(':', "'")
+
+
+def ask_to_choose_file(path):
+    chosen_file = None
+
+    while chosen_file is None:
+        clear_console()
+        print("There are more than 1 file inside the folder!")
+        print("\nPlease choose one of the following:")
+
+        for number, f in enumerate(os.listdir(path)):
+            print("\t[{}] {}".format(number, f))
+        x = int(input("\nEnter a number: "))
+
+        if x not in range(len(original_files)):
+            clear_console()
+            print("Invalid Selection!")
+            time.sleep(1)
+            continue
+
+        chosen_file = original_files[x]
+    clear_console()
+    return chosen_file
 
 
 if __name__ == '__main__':
@@ -42,37 +70,15 @@ if __name__ == '__main__':
 
     original_files = os.listdir(path_original_files)
 
-    def clear_console(): return os.system('cls')
-
     if not original_files:
         print("There is are no files to process in 'Original Files'")
         input("Press return to exit...")
-        exit()
+        sys.exit()
 
     chosen_file = original_files[0]
 
     if len(original_files) > 1:
-        chosen_file = None
-
-        while chosen_file is None:
-            clear_console()
-            print("There are more than 1 file inside the folder!")
-            print("\nPlease choose one of the following:")
-
-            for number, f in enumerate(os.listdir(path_original_files)):
-                print("\t[{}] {}".format(number, f))
-            x = int(input("\nEnter a number: "))
-
-            if x not in range(len(original_files)):
-                clear_console()
-                print("Invalid Selection!")
-                time.sleep(1)
-                continue
-
-            chosen_file = original_files[x]
-            print(chosen_file)
-
-        clear_console()
+        chosen_file = ask_to_choose_file(path_original_files)
 
     for count, file_name in enumerate(os.listdir(path_original_files)):
 
@@ -92,7 +98,8 @@ if __name__ == '__main__':
                 edited_file_path = create_path(
                     path_formatted_files, generated_file_name)
 
-            Excel.append_data_to_template(Analysis.data_entries, save_as=edited_file_path)
+            Excel.append_data_to_template(
+                Analysis.data_entries, save_as=edited_file_path)
             break
 
         except FileNotFoundError() as fnf:
