@@ -12,7 +12,6 @@ import sys
 import time
 import datetime
 
-import glob
 from handler import Excel, Analysis
 
 
@@ -36,9 +35,9 @@ def current_time():
 
 
 def ask_to_choose_file(path):
-    chosen_file = None
+    file_name = None
 
-    while chosen_file is None:
+    while file_name is None:
         clear_console()
         print("There are more than 1 file inside the folder!")
         print("\nPlease choose one of the following:")
@@ -53,9 +52,9 @@ def ask_to_choose_file(path):
             time.sleep(1)
             continue
 
-        chosen_file = original_files[x]
+        file_name = original_files[x]
     clear_console()
-    return chosen_file
+    return file_name
 
 
 if __name__ == '__main__':
