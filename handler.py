@@ -18,7 +18,7 @@ class Analysis():
         self.csv_file = csv.reader(file)
         self.columns = self.get_headers(file) if has_headers else None
 
-    def analyze(self, sorted=True):
+    def analyze(self, sort=True):
         ''' Performs analysis for each row and saves the output to a csv. '''
         for row in self.csv_file:
             self.update_row_data(row)
@@ -27,7 +27,7 @@ class Analysis():
                 Analysis.employees_completed.append(self.employee_id)
                 self.append_data_entry()
 
-            if sorted:
+            if sort:
                 Analysis.sorted_by_rate(Analysis.data_entries)
 
     def append_data_entry(self):
