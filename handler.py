@@ -1,6 +1,7 @@
 import csv
-
+import os
 import pandas
+import openpyxl
 
 
 class Analysis():
@@ -57,13 +58,15 @@ class Analysis():
         return columns
 
     @staticmethod
-    def calculate_rate(units_per_hour): return float(
-        '{:.1f}'.format(units_per_hour / 60))
+    def calculate_rate(units_per_hour):
+        return float('{:.1f}'.format(units_per_hour / 60))
 
     @staticmethod
     def sorted_by_rate(entries, increasing_order=False):
-        entries.sort(key=lambda x: x[len(x)-1],
-                     reverse=(increasing_order == False))
+        if not increasing_order:
+            entries.sort(key=lambda x: x[len(x)-1], reverse=(increasing_order == False))
+        else:
+            entries.sort(key=lambda x: x[len(x)-1])   
         return entries
 
     @staticmethod
@@ -81,4 +84,21 @@ class Excel():
         if not file:
             raise "No file was given to convert"
         csv_file = pandas.read_csv(file)
-        csv_file.to_excel('output.xlsx', sheet_name=file.split('\\')[-1], index=False)
+
+        with pandas.ExcelWriter('copy.xlsx', mode='a') as writer:
+            csv_file.to_excel(writer, index=False)
+    
+    @staticmethod
+    def append_data_to_sheet(data):
+        template_file = 'copy.xlsx'
+        wb = openpyxl.load_workbook(template_file)
+        ws = wb.active
+
+        for row, info in enumerate(data, start=1):
+            print(row, info)
+            ws['A{}'.format(row)] = info[0]
+            ws['B{}'.format(row)] = info[1]
+            ws['C{}'.format(row)] = info[2]
+        
+        wb.save('sample.xlsx')
+        print('hsdhfh')
