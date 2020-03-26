@@ -7,4 +7,4 @@ How to use:
   2. Store the csv file to analyze. It should automatically run analysis and open a Excel document with proper formatting.
   
   Extra:
-  a) If there are more than one file in the "Original Files", it will ask which file to run analysis. This program DOES NOT delete the files contained in the Original Files folder. YOU must DELETE.
+  1. If there are more than one file in the "Original Files", it will ask which file to run analysis. This program DOES NOT delete the files contained in the Original Files folder. YOU must DELETE.
