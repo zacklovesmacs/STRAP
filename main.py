@@ -103,8 +103,10 @@ if __name__ == '__main__':
 
         except FileNotFoundError() as fnf:
             print("File not found:\n", fnf)
+            input()
         except Exception() as e:
             print(e)
+            input()
 
     # os.remove(path_original_files)
     #print("Conversion completed!")
