@@ -14,9 +14,21 @@ class Analysis():
     key_units = "Units"
     key_uph = "UPH"
 
-    def __init__(self, file, has_headers=True):
+    def __init__(self, file):
         self.csv_file = csv.reader(file)
-        self.columns = self.get_headers(file) if has_headers else None
+        column_headers = self.get_headers(file)
+
+        # verify if file has columns/data needed
+        if not self.has_required_columns(column_headers):
+            raise Exception(
+                "File does not have required columns of data to analyze correctly.")
+
+        self.columns = {
+            'employee_id': column_headers.index(Analysis.key_employee_id),
+            'employee': column_headers.index(Analysis.key_employee),
+            'units': column_headers.index(Analysis.key_units),
+            'uph': column_headers.index(Analysis.key_uph)
+        }
 
     def analyze(self, sort=True):
         ''' Performs analysis for each row and saves the output to a csv. '''
@@ -50,15 +62,16 @@ class Analysis():
 
     def get_headers(self, file):
         column_header = str(file.readline()).split(',')
+        return column_header
 
-        # read first line (header) and store the indexes for "Employee Name", "Units", "UPH"
-        columns = {
-            'employee_id': column_header.index(Analysis.key_employee_id),
-            'employee': column_header.index(Analysis.key_employee),
-            'units': column_header.index(Analysis.key_units),
-            'uph': column_header.index(Analysis.key_uph)
-        }
-        return columns
+    def has_required_columns(self, col):
+        ''' Validates that the file has the necessary data columns '''
+        return (
+            Analysis.key_employee_id in col and
+            Analysis.key_employee in col and
+            Analysis.key_units in col and
+            Analysis.key_uph in col
+        )
 
     @staticmethod
     def calculate_rate(units_per_hour):
@@ -72,13 +85,6 @@ class Analysis():
         else:
             entries.sort(key=lambda x: x[len(x)-1])
         return entries
-
-    @staticmethod
-    def save(path):
-        ''' Saves ALL entries in data_entries to the given path '''
-        with open(path, 'w', newline='') as edited_csv:
-            csv.writer(edited_csv).writerows(
-                Analysis.sorted_by_rate(Analysis.data_entries))
 
 
 class Excel():
