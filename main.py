@@ -12,6 +12,10 @@ import sys
 import time
 import datetime
 
+import tkinter
+
+from datetime import datetime
+from tkinter import filedialog
 from handler import Excel, Analysis
 
 
@@ -21,97 +25,60 @@ def create_folder(name):
         os.mkdir(name)
 
 
-def clear_console():
-    return os.system('cls')
-
-
 def create_path(path, file):
     return "{}\{}".format(path, file)
 
 
 def current_time():
     """ Returns the local time in ISO format. Without microseconds. """
-    return datetime.datetime.now().replace(microsecond=0).isoformat().replace(':', "'")
+    return datetime.now().strftime("%m-%d-%Y %H'%M'%S")
+    
 
-
-def ask_to_choose_file(path):
-    file_n = None
-
-    while file_n is None:
-        clear_console()
-        print("There are more than 1 file inside the folder!")
-        print("\nPlease choose one of the following:")
-
-        for number, f in enumerate(os.listdir(path)):
-            print("\t[{}] {}".format(number, f))
-        x = int(input("\nEnter a number: "))
-
-        if x not in range(len(original_files)):
-            clear_console()
-            print("Invalid Selection!")
-            time.sleep(1)
-            continue
-
-        file_n = original_files[x]
-    clear_console()
-    return file_n
+def choose_file():
+    tk = tkinter.Tk()
+    # hide tkinter window when opening file browser
+    tk.withdraw()
+    filename = filedialog.askopenfilename()
+    return filename
 
 
 if __name__ == '__main__':
+    reports_folder_path = create_path(os.getcwd(), "Reports")
+    create_folder(reports_folder_path)
 
-    # create directories for files if not done already
-    cwd = os.getcwd()
-    path_original_files = create_path(cwd, "Original Files")
-    path_formatted_files = create_path(cwd, "Formatted Files")
+    try:
 
-    create_folder(path_original_files)
-    create_folder(path_formatted_files)
-
-    original_files = os.listdir(path_original_files)
-
-    if not original_files:
-        print("There is are no files to process in 'Original Files'")
-        input("Press return to exit...")
-        sys.exit()
-
-    chosen_file = original_files[0]
-
-    if len(original_files) > 1:
-        chosen_file = ask_to_choose_file(path_original_files)
-
-    for count, file_name in enumerate(os.listdir(path_original_files)):
-
-        if file_name != chosen_file:
-            continue
+        data_file = choose_file()
+        
+        # no file was selected; cancel button most likely hit
+        if not data_file:
+            sys.exit()
 
         # open file inside the folder
-        file_path = create_path(path_original_files, file_name)
+        with open(data_file, 'r') as f:
+            stow_rate_data = Analysis(f)
+            stow_rate_data.analyze()
 
-        try:
-            with open(file_path, 'r') as f:
-                csv_file = Analysis(f)
-                csv_file.analyze()
-
-                # csv name shoud be date and time at generation
-                generated_file_name = "{}_stow rates".format(current_time())
-                edited_file_path = create_path(
-                    path_formatted_files, generated_file_name)
+            # csv name shoud be date and time at generation
+            creation_date = current_time()
+            report_name = "{}_stow rates".format(creation_date)
+            report_path = (create_path(reports_folder_path, report_name))
 
             Excel.append_data_to_template(
-                Analysis.data_entries, save_as=edited_file_path)
-            break
+                Analysis.data_entries, save_as=report_path)
 
-        except FileNotFoundError() as fnf:
-            print("File not found:\n", fnf)
-            input()
-        except Exception() as e:
-            print(e)
-            input()
+        print("\nConversion Complete!")
+        print("Opening Excel Document...")
+        time.sleep(2)
 
-    # os.remove(path_original_files)
-    #print("Conversion completed!")
-    print("\nConversion Complete!")
-    print("Opening Excel Document...")
-    time.sleep(2)
+        os.startfile(report_path + '.xlsx')
 
-    os.startfile(edited_file_path + '.xlsx')
+    except FileNotFoundError as fnfe:
+        print(fnfe)
+        input("Press return to exit...")
+    except NameError as ne:
+        print(ne)
+        input("Press return to exit...")
+    except Exception as e:
+        print(e)
+        input("Press return to exit...")
