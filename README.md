@@ -1,5 +1,7 @@
 # STRAP (Stow Rate Analyzer Program)
 
+UPDATE: Please check out the PyInstaller-APP branch for a Python-Independent version of this program.
+
 Calculates given rates and displays them in a formatted excel spreadsheet for users.
 
 How to use:
